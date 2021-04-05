@@ -1,6 +1,7 @@
 require 'base64'
 require 'json'
 require 'httparty'
+require 'net/http'
 
 module PowerBiEmbedded
   class Base
@@ -11,8 +12,26 @@ module PowerBiEmbedded
     end
 
     def self.post(endpoint, body = nil, headers = nil)
-      response = HTTParty.post(endpoint, headers: headers, body: body)
-      parse_response(response)
+      if(endpoint.include?('GenerateToken'))
+        uri = URI.parse(endpoint)
+        request = Net::HTTP::Post.new(uri)
+        request.content_type = "application/json"
+        request.body = body.to_json
+
+        request["Authorization"] = headers[:Authorization]
+
+        req_options = {
+          use_ssl: uri.scheme == "https",
+        }
+
+        res = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
+        return JSON.parse(res.body)
+      else
+        response = HTTParty.post(endpoint, headers: headers, body: body)
+        parse_response(response)
+      end
     end
 
     def self.put(endpoint, body = nil, headers = nil)
