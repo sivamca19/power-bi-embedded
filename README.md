@@ -35,6 +35,14 @@ Or install it yourself as:
 
 ### Authenticate
 
+#### Using Service Principal credentials
+
+```ruby
+PowerBiEmbedded::Authenticate.new(tenant_id: TENANT_ID, client_id: CLIENT_ID, client_secret: CLIENT_SECRET, grant_type: GRANT_TYPE).call
+```
+
+#### Using Power BI Pro master user credentials
+
 ```ruby
 PowerBiEmbedded::Authenticate.new(username: POWERBI_USERNAME, password: POWERBI_PASSWORD, refresh_token: REFRESH_TOKEN, client_id: CLIENT_ID, grant_type: GRANT_TYPE).call
 ```

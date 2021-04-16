@@ -1,20 +1,20 @@
 module PowerBiEmbedded
   class Authenticate
 
-    BASE_URL   = "https://login.windows.net/common/oauth2/token"
-    RESOURCE   = "https://analysis.windows.net/powerbi/api"
+    RESOURCE = "https://analysis.windows.net/powerbi/api"
 
-    def initialize(username: nil, password: nil, refresh_token: nil, client_id: nil, client_secret: nil, grant_type: nil)
+    def initialize(username: nil, password: nil, refresh_token: nil, client_id: nil, tenant_id: nil, client_secret: nil, grant_type: nil)
       @username      = username
       @password      = password
       @refresh_token = refresh_token
       @client_id     = client_id
+      @tenant_id     = tenant_id
       @client_secret = client_secret
       @grant_type    = grant_type
     end
 
     def call
-      PowerBiEmbedded::Base.post(BASE_URL, build_body, build_headers)
+      PowerBiEmbedded::Base.post(build_url, build_body, build_headers)
     end
 
     private
@@ -31,9 +31,16 @@ module PowerBiEmbedded
       }.compact
     end
 
-    def build_headers
-      { 'Content-Type': 'application/x-www-form-urlencoded'}
+    def build_url
+      if @tenant_id
+        "https://login.microsoftonline.com/#{@tenant_id}/oauth2/token"
+      else
+        "https://login.windows.net/common/oauth2/token"
+      end
     end
 
+    def build_headers
+      { 'Content-Type': 'application/x-www-form-urlencoded' }
+    end
   end
 end
